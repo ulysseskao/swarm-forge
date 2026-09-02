@@ -1,5 +1,5 @@
 # Local Engineering Rules
 
 ## Verification
-- Every agent except the specifier must run unit tests and acceptance tests before handoff and fix any failures.
-- The architect, hardender, and QA must run property tests before handoff when the project has them and fix any failures.
+- 除了 specifier 之外，每個 agent 都必須在 handoff 前執行 unit tests 與 acceptance tests，並修正任何 failures。
+- 當 project 有 property tests 時，architect、hardender 和 QA 必須在 handoff 前執行 property tests，並修正任何 failures。
