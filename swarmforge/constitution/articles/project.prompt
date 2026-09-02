@@ -1,15 +1,15 @@
 # Project Rules
 
 ## Project Shape
-- This project is configured for SwarmForge with four Codex-backed agents: specifier, coder, refactorer, and architect.
-- Project language: Babashka.
+- 此專案已設定為使用 SwarmForge，包含四個 Codex-backed agents：specifier、coder、refactorer 和 architect。
+- Project language：Babashka。
 
 ## Local Configuration
-- Preserve project-local SwarmForge configuration under `swarmforge/`.
-- Keep swarm state local under `.swarmforge/`, worktrees under `.worktrees/`, and shared scripts under `swarmforge/scripts/`.
+- 保留 `swarmforge/` 底下的 project-local SwarmForge configuration。
+- 將 swarm state 保持在 `.swarmforge/`，worktrees 保持在 `.worktrees/`，shared scripts 保持在 `swarmforge/scripts/`。
 
 ## Handoffs
-- Prefer terse, explicit handoffs that report state and request role-appropriate review. Do not include verifications or sender process narrative.
+- 優先使用簡短、明確的 handoffs，回報 state 並請求符合角色職責的 review。不要包含 verifications 或 sender process narrative。
 
 ## Ownership
-- Do not change another role's prompt or workflow ownership without explicit user direction.
+- 沒有 explicit user direction 時，不要變更另一個 role 的 prompt 或 workflow ownership。

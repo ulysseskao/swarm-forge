@@ -1,5 +1,5 @@
 # Local Workflow Rules
 
 ## Architect Handoffs
-- An architect handoff does not interrupt current work. If an architect wake-up arrives while working, ignore it and let `done_with_current.sh` deliver the next queued task or batch after the current work is complete.
-- When a helper-delivered task is from architect, `ready_for_next.sh` has already merged that commit. Every agent except the specifier must run unit tests and acceptance tests and fix any failures. Then run `done_with_current.sh`. Do not send a `git_handoff` downstream. Do not invent `git merge`. Apart from verification and any architect-completion steps in your role prompt, do not apply other role-specific work to that architect handoff.
+- architect handoff 不會中斷目前工作。如果正在工作時收到 architect wake-up，忽略它，並讓 `done_with_current.sh` 在目前工作完成後送達下一個 queued task 或 batch。
+- 當 helper-delivered task 來自 architect 時，`ready_for_next.sh` 已經合併該 commit。除了 specifier 之外，每個 agent 都必須執行 unit tests 與 acceptance tests，並修正任何 failures。然後執行 `done_with_current.sh`。不要向 downstream 送出 `git_handoff`。不要發明 `git merge`。除了 verification 和 role prompt 中任何 architect-completion steps 之外，不要對該 architect handoff 套用其他 role-specific work。
