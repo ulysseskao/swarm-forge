@@ -1,22 +1,18 @@
 # Handoff Rules
 
 ## Sending Handoffs
-- Write a draft handoff file with only structured headers under `./tmp/` in the assigned worktree, then run `swarm_handoff.sh <draft-file>`.
-- `swarm_handoff.sh` rejects drafts in `/tmp` and `.swarmforge/handoffs/outbox/tmp/`.
-- `swarm_handoff.sh --help` prints usage. Do not pass `--help` as a draft path.
-- Use only these message types:
+- 在指定的 worktree 中，於 `./tmp/` 下撰寫只包含 structured headers 的 draft handoff file，然後執行 `swarm_handoff.sh <draft-file>`。
+- `swarm_handoff.sh` 會拒絕位於 `/tmp` 和 `.swarmforge/handoffs/outbox/tmp/` 的 drafts。
+- `swarm_handoff.sh --help` 會印出 usage。不要把 `--help` 當成 draft path 傳入。
+- 只使用以下 message types：
   - `git_handoff`
   - `note`
-- Do not send `note` handoffs unless the user, role prompt, or constitution
-  explicitly directs you to send one.
-- When blocked by ambiguity, contradiction, or test/specification conflict,
-  ask the operator with `pack_dashboard_request.sh clarify ./tmp/question.txt`.
-  Do not ask in the pane. Do not send a `note` handoff unless one of
-  the explicit authorities above directed that note.
-- For `git_handoff`, commit first, then write a draft. The helper fills `commit` and `artifacts` from the sender worktree HEAD; do not type a SHA. If `SWARMFORGE_ROLE` is unset, the helper infers the role from `roles.tsv` and this worktree.
-- If you are the master agent on a pack that includes specifier, queue `git_handoff` when the work is ready. Do not ask for approval in the pane; the operator uses Attention.
-- Do not add extra git headers (`coverage`, CRAP, evidence). If evidence is needed, the helper writes it.
-- For `git_handoff`, write:
+- 除非 user、role prompt 或 constitution 明確指示，否則不要送出 `note` handoffs。
+- 如果因為模糊、矛盾或 test/specification 衝突而被阻塞，請用 `pack_dashboard_request.sh clarify ./tmp/question.txt` 詢問 operator。不要在 pane 裡提問。除非上述明確權威來源之一要求送出 `note`，否則不要送 `note` handoff。
+- 對於 `git_handoff`，先 commit，再撰寫 draft。Helper 會從 sender worktree HEAD 填入 `commit` 與 `artifacts`；不要手打 SHA。如果 `SWARMFORGE_ROLE` 未設定，helper 會從 `roles.tsv` 與這個 worktree 推斷角色。
+- 如果你是在包含 specifier 的 pack 裡擔任 master agent，當工作就緒時 queue `git_handoff`。不要在 pane 裡要求 approval；operator 會使用 Attention。
+- 不要加入額外 git headers（`coverage`、CRAP、evidence）。如果需要 evidence，helper 會寫入。
+- 對於 `git_handoff`，請寫：
 
 ```text
 type: git_handoff
@@ -25,16 +21,11 @@ priority: NN
 task: <short-stable-task-name>
 ```
 
-- After completing a forward inbound task, always send a `git_handoff` to the
-  next role in the chain, regardless of what changed. Formatting-only,
-  manifest-only, audit-only, generated metadata, and other non-functional churn
-  still require a forward down the chain.
-- A reverse (`non-forwarding`) inbound `git_handoff` is merge-only. Merge it,
-  then `done_with_current`. Do not send a `git_handoff` for that inbound. The
-  helper refuses a `git_handoff` while inbound is `non-forwarding`.
-- Preserve the received task name when forwarding work for the same task.
-- The master agent uses the existing New Task / board card name as `task:`. Do not invent a name.
-- For `note`, write:
+- 完成 forward inbound task 後，無論變更內容為何，都一定要送出 `git_handoff` 給 chain 中的下一個角色。即使只是 formatting-only、manifest-only、audit-only、generated metadata 或其他 non-functional churn，也仍然需要沿 chain forward。
+- reverse（`non-forwarding`）inbound `git_handoff` 只做 merge。Merge 後執行 `done_with_current`。不要為該 inbound 送出 `git_handoff`。當 inbound 是 `non-forwarding` 時，helper 會拒絕 `git_handoff`。
+- 為同一個 task forward work 時，保留收到的 task name。
+- master agent 使用既有 New Task / board card name 作為 `task:`。不要發明名稱。
+- 對於 `note`，請寫：
 
 ```text
 type: note
@@ -43,43 +34,25 @@ priority: NN
 message: <one line, max 80 chars>
 ```
 
-- If `swarm_handoff.sh` reports validation errors, repair the draft and rerun it.
-- After a successful send, the helper removes the draft file. If you need to
-  remove a stale draft manually, use `rm <draft-file>`, not `rm -f`.
-- Do not write long handoff bodies. The helper generates the delivered payload.
-- Do not send tmux notifications directly.
-- Do not hand-edit, merge, stage, or commit handoff runtime state.
+- 如果 `swarm_handoff.sh` 回報 validation errors，修正 draft 後重新執行。
+- 成功送出後，helper 會移除 draft file。如果需要手動移除 stale draft，請使用 `rm <draft-file>`，不要使用 `rm -f`。
+- 不要撰寫冗長的 handoff bodies。Helper 會產生實際送出的 payload。
+- 不要直接送 tmux notifications。
+- 不要手動編輯、merge、stage 或 commit handoff runtime state。
 
 ## Receiving Handoffs
-- When notified, run `ready_for_next.sh`. If `SWARMFORGE_ROLE` is unset, the
-  helper infers the role from `roles.tsv` and this worktree.
-- `ready_for_next.sh` dispatches to the task or batch helper configured for
-  your role. For `git_handoff` it merges the inbound commit
-  (`merge_and_process.sh <sender> <commit>`).
-- Structure improves as work moves down the pack. On a reverse
-  (`non-forwarding`) `git_handoff`, the inbound tree is the structure. Replay
-  this role's current task onto that shape. Do not keep the pre-inbound layout
-  in order to save local work. On a forward `git_handoff`, this role's current
-  tree is the structure. Replay the inbound work onto that shape. Do not adopt
-  the inbound layout in order to save merge work.
-- If merge_and_process.sh or ready_for_next reports a merge conflict, resolve
-  every conflicted file, `git add` them, and commit. You own conflict
-  resolution. Do not invent a new `git merge`. Parallel cards on one tree
-  will conflict; that is expected.
-- If it prints `NO_TASK`, stop waiting for work.
-- If it prints `TASK: <path>`, treat the printed `PAYLOAD` as the task.
-- If it prints `TASK_NAME: <name>`, use that as the stable task name for any
-  work you forward from that task.
-- If it prints `BATCH: <path>`, treat each printed `BATCH_ITEM` as part of the
-  current batch in helper-delivered order.
-- Use only the task information printed by the helper scripts.
-- If a tmux wake-up arrives while already working on a task, ignore it.
-- When the task or batch is fully complete, run `done_with_current.sh`. After a
-  reverse (`non-forwarding`) merge, that is the completion; do not queue a
-  `git_handoff` for that inbound.
-- `note` handoffs are tasks too; after reading or acting on a note, run
-  `done_with_current.sh` before accepting any other handoff.
-- If `done_with_current.sh` prints `MAIL_WAITING`, run `ready_for_next.sh` as a
-  new turn. Do not treat done output as the next merge.
-- If a done helper prints `NO_TASK`, stop waiting for work.
-- On restart, run `ready_for_next.sh` and follow its output.
+- 收到通知時，執行 `ready_for_next.sh`。如果 `SWARMFORGE_ROLE` 未設定，helper 會從 `roles.tsv` 與這個 worktree 推斷角色。
+- `ready_for_next.sh` 會 dispatch 到針對你角色設定的 task 或 batch helper。對於 `git_handoff`，它會合併 inbound commit（`merge_and_process.sh <sender> <commit>`）。
+- 隨著工作在 pack 中往下游移動，結構會逐步改善。在 reverse（`non-forwarding`）`git_handoff` 中，inbound tree 就是結構。把此角色目前的 task replay 到該形狀上。不要為了保留本地工作而維持 pre-inbound layout。在 forward `git_handoff` 中，此角色目前的 tree 就是結構。把 inbound work replay 到該形狀上。不要為了省 merge work 而採用 inbound layout。
+- 如果 merge_and_process.sh 或 ready_for_next 回報 merge conflict，請解決每一個 conflicted file、對它們執行 `git add`，然後 commit。Conflict resolution 是你的職責。不要發明新的 `git merge`。同一棵 tree 上的 parallel cards 發生 conflict 是預期情況。
+- 如果它印出 `NO_TASK`，停止等待工作。
+- 如果它印出 `TASK: <path>`，把印出的 `PAYLOAD` 視為 task。
+- 如果它印出 `TASK_NAME: <name>`，將其作為你從該 task forward 任何工作時的 stable task name。
+- 如果它印出 `BATCH: <path>`，把每個印出的 `BATCH_ITEM` 依 helper 送達順序視為目前 batch 的一部分。
+- 只使用 helper scripts 印出的 task information。
+- 如果正在處理 task 時收到 tmux wake-up，忽略它。
+- 當 task 或 batch 完全完成時，執行 `done_with_current.sh`。在 reverse（`non-forwarding`）merge 之後，這就是 completion；不要為該 inbound queue `git_handoff`。
+- `note` handoffs 也是 tasks；閱讀或處理 note 後，先執行 `done_with_current.sh`，再接受任何其他 handoff。
+- 如果 `done_with_current.sh` 印出 `MAIL_WAITING`，把 `ready_for_next.sh` 當成新 turn 執行。不要把 done output 當成下一個 merge。
+- 如果 done helper 印出 `NO_TASK`，停止等待工作。
+- restart 時，執行 `ready_for_next.sh` 並遵循其輸出。

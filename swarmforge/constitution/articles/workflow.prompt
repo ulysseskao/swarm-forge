@@ -1,18 +1,18 @@
 # Workflow Rules
 
 ## Worktree Discipline
-- At startup, discover and remember the branch or worktree assigned to your role.
-- If your assigned worktree is `master`, work in the main project checkout on its current branch; do not expect or create a `.worktrees/<role>` directory for that role.
-- Work only in your assigned branch or worktree.
-- Do not inspect, diff, merge, or base work on another branch unless that branch is specifically named in a handoff or explicit user instruction.
-- Do not run `./swarm` from an agent worktree to repair helper scripts. If handoff helper scripts are missing from PATH, stop and report the startup failure.
+- 啟動時，找出並記住分配給你角色的 branch 或 worktree。
+- 如果分配給你的 worktree 是 `master`，請在 main project checkout 的目前 branch 上工作；不要期待或建立該角色的 `.worktrees/<role>` 目錄。
+- 只在分配給你的 branch 或 worktree 中工作。
+- 除非 handoff 或明確 user instruction 具名指定另一個 branch，否則不要 inspect、diff、merge 或以另一個 branch 作為工作基礎。
+- 不要從 agent worktree 執行 `./swarm` 來修復 helper scripts。如果 handoff helper scripts 未出現在 PATH，停止並回報 startup failure。
 
 ## Announcements
-- Do not add role bylines to announcements or check-in comments.
+- 不要在 announcements 或 check-in comments 加入 role bylines。
 
 ## Commit Messages
-- Include your role byline in every git commit message in this form: `By <role>.`
-- Example:
+- 每個 git commit message 都要包含你的 role byline，格式如下：`By <role>.`
+- 範例：
 
 ```text
 Implement handoff validation
@@ -20,12 +20,12 @@ Implement handoff validation
 By coder.
 ```
 
-- A commit-msg hook appends `By <role>.` when it is missing. Do not skip the hook (`--no-verify`).
+- 當缺少 `By <role>.` 時，commit-msg hook 會自動附加。不要跳過 hook（`--no-verify`）。
 
 ## Temporary Files
-- Use `./tmp/` in your assigned worktree for temporary files; do not use `/tmp`.
-- Parse and dry-check into `./tmp/…`. Write handoff drafts in `./tmp/` as well.
-- Do not use `.swarmforge/handoffs/outbox/tmp/` as scratch; that directory is for the handoff helper.
+- 在分配給你的 worktree 中使用 `./tmp/` 存放 temporary files；不要使用 `/tmp`。
+- 將 parse 與 dry-check 輸出到 `./tmp/…`。Handoff drafts 也寫在 `./tmp/`。
+- 不要把 `.swarmforge/handoffs/outbox/tmp/` 當作 scratch；該目錄屬於 handoff helper。
 
 ## Failure Conditions
-- If the expected git layout or assigned worktree is missing, stop and report instead of silently working in the wrong place.
+- 如果預期的 git layout 或分配的 worktree 不存在，停止並回報；不要默默在錯誤位置工作。

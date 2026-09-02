@@ -341,12 +341,12 @@
     (assoc task :status
            (cond
              (= "done" role) ""
-             (rejected-task? root name) "REJECTED"
+             (rejected-task? root name) "已退回"
              (or (contains? (pending-approval-ids root) task-id)
-                 (contains? (pending-approval-names root) name)) "Waiting for approval"
+                 (contains? (pending-approval-names root) name)) "等待核准"
              (contains? (active-card-names root role) name)
              (pane-status-for root role)
-             :else "waiting in queue"))))
+             :else "在佇列中等待"))))
 
 (defn batch-task-names [dir]
   (in-process-task-names (handoff-files dir)))
@@ -392,7 +392,7 @@
          :updated_at (or (not-empty (get h "dequeued_at")) "")
          :audit_count 0
          :merging true
-         :status (str "Merging " sender)}))))
+         :status (str "正在合併 " sender)}))))
 
 (defn merging-cards [root]
   (vec (keep #(merging-card root %) (role-rows root))))
@@ -728,9 +728,9 @@
 
 (defn clar-wake [id role question answer]
   (str "[" id "]\n"
-       "Clarification requested from: " role "\n"
-       "Question:\n" (str/trimr (or question "")) "\n"
-       "Answer:\n" (str/trimr (or answer ""))))
+      "需要澄清，來源：" role "\n"
+       "問題：\n" (str/trimr (or question "")) "\n"
+       "回答：\n" (str/trimr (or answer ""))))
 
 (defn write-chat-request! [root text]
   (let [id (chat-id)
@@ -783,7 +783,7 @@
         projects (mapv #(project-slice root %) open)]
     {:forge true
      :master_role "lieutenant"
-     :master_display "Lieutenant"
+     :master_display "主控"
      :packs (mapv (fn [p] {:name p :conf (or (forge/pack-conf root p) "")})
                   (forge/list-pack-names root))
      :all_projects (forge/list-project-names root)
@@ -812,7 +812,7 @@
 
 (defn require-root! [root]
   (when (str/blank? root)
-    (exit! 1 "Missing project root"))
+    (exit! 1 "缺少 project root"))
   root)
 
 (defn dashboard-page []
@@ -942,9 +942,9 @@
 
 (defn delete-task! [root name]
   (when (str/blank? name)
-    (throw (ex-info "Missing task name" {:http-status 400})))
+    (throw (ex-info "缺少 task name" {:http-status 400})))
   (when-not (rejected-task? root name)
-    (throw (ex-info (str "Not rejected: " name) {:http-status 400})))
+    (throw (ex-info (str "不是已退回的任務：" name) {:http-status 400})))
   (let [task-id (task-id-for-name root name)]
     (archive-rejected! root task-id name)
     (drop-task-handoffs! root task-id name)
@@ -954,7 +954,7 @@
   (fs/delete-if-exists (reject-notify root name)))
 
 (defn retry-task! [root name text]
-  (throw (ex-info "Retry requires a pending approval id" {:http-status 400})))
+  (throw (ex-info "重試需要 pending approval id" {:http-status 400})))
 
 (defn post-delete-task [root body]
   (let [{:keys [name id]} (json/parse-string (or body "{}") true)]
@@ -970,7 +970,7 @@
   (let [{:keys [id comments]} (json/parse-string (or body "{}") true)]
     (try
       (when (str/blank? id)
-        (throw (ex-info "Missing approval id" {:http-status 400})))
+        (throw (ex-info "缺少 approval id" {:http-status 400})))
       (retry-approval! root id comments)
       (json-ok)
       (catch Exception e
@@ -978,7 +978,7 @@
 
 (defn create-task! [root name text]
   (when (str/blank? name)
-    (throw (ex-info "Missing task name" {:http-status 400})))
+    (throw (ex-info "缺少 task name" {:http-status 400})))
   (let [task-id (new-task-id name)]
   (pack-board root "create"
               "--name" name
@@ -994,7 +994,7 @@
                root)]
     (try
       (when (and (forge/forge? root) (str/blank? project))
-        (throw (ex-info "Missing project" {:http-status 400})))
+        (throw (ex-info "缺少 project" {:http-status 400})))
       (create-task! dest name text)
       (json-ok)
       (catch Exception e
@@ -1025,7 +1025,7 @@
 (defn answer-clarification! [root id text]
   (let [src (clar-pending-file root id)]
     (when-not (fs/regular-file? src)
-      (throw (ex-info (str "Unknown clarification: " id) {:http-status 404})))
+      (throw (ex-info (str "未知的 clarification：" id) {:http-status 404})))
     (let [entry (parse-clarification src)
           dest (fs/path (clar-done-dir root) (str id ".request"))
           role (:role entry)]
@@ -1046,7 +1046,7 @@
     (let [text (or (:text (json/parse-string (or body "{}") true)) "")]
       (answer-clarification! root id text)
       (json-ok))
-    {:status 404 :body "Not found"}))
+    {:status 404 :body "找不到"}))
 
 (defn pending-file [root id]
   (fs/path (pending-dir root) (str id ".handoff")))
@@ -1054,7 +1054,7 @@
 (defn require-pending! [root id]
   (let [path (pending-file root id)]
     (when-not (fs/regular-file? path)
-      (throw (ex-info (str "Unknown approval: " id) {:http-status 404})))
+      (throw (ex-info (str "未知的 approval：" id) {:http-status 404})))
     path))
 
 (defn with-approved [content]
@@ -1074,7 +1074,7 @@
 
 (defn save-review! [root id path comments]
   (when (str/blank? path)
-    (throw (ex-info "Missing path" {:http-status 400})))
+    (throw (ex-info "缺少 path" {:http-status 400})))
   (let [src (require-pending! root id)
         headers (:headers (parse-message src))
         task-id (or (not-empty (get headers "task_id")) (get headers "task"))
@@ -1161,9 +1161,9 @@
 (defn retry-message [task comments reviews]
   (let [extra (str/trim (or comments ""))
         findings (review-findings reviews)]
-    (str "Retry audit for " task
-         ". Re-read tasks/" task ".md as operator intent."
-         " Read the remedial comments as audit findings."
+    (str "請為 " task " 重試審查。"
+         " 重新閱讀 tasks/" task ".md，將其視為 operator intent。"
+         " 將補救意見視為 audit findings。"
          (when-not (str/blank? extra) (str "\n\n" extra))
          (when-not (str/blank? findings) (str "\n\n" findings)))))
 
@@ -1191,7 +1191,7 @@
                  "task: " task "\n"
                  (when base (str "task_base_commit: " base "\n"))
                  "\n"
-                 "Retry audit.\n")))))
+                 "重試審查。\n")))))
 
 (defn restore-task-base! [root headers]
   (let [task-id (or (not-empty (get headers "task_id")) (get headers "task"))
@@ -1269,8 +1269,8 @@
                    (json-ok))
       {:status 400
        :headers {"Content-Type" "application/json"}
-       :body (json/generate-string {:error "Reject opens the dialog; use Retry, Delete, or Accept."})})
-    {:status 404 :body "Not found"}))
+       :body (json/generate-string {:error "退回會開啟對話框；請使用重試、刪除或接受。"})})
+    {:status 404 :body "找不到"}))
 
 (defn query-value [uri key]
   (when-let [q (second (str/split (or uri "") #"\?" 2))]
@@ -1309,7 +1309,7 @@
       {:status 200
        :headers {"Content-Type" "text/plain; charset=utf-8"}
        :body (slurp (str (existing-path root rel)))}
-      {:status 404 :body "Not found"})))
+      {:status 404 :body "找不到"})))
 
 (defn parse-unified-diff [text]
   (->> (str/split-lines (or text ""))
@@ -1344,7 +1344,7 @@
   (let [rel (query-value uri "path")
         id (query-value uri "id")]
     (if-not (allowed-doc? root rel)
-      {:status 404 :body "Not found"}
+      {:status 404 :body "找不到"}
       (let [text (slurp (str (existing-path root rel)))
             headers (pending-headers root id)
             task-id (or (not-empty (get headers "task_id")) (get headers "task"))
@@ -1380,7 +1380,7 @@
       {:status 200
        :headers {"Content-Type" "text/plain; charset=utf-8"}
        :body (str name "\n\n" (slurp (str file)))}
-      {:status 404 :body "Not found"})))
+      {:status 404 :body "找不到"})))
 
 (defn html-escape [value]
   (-> (str value)
@@ -1509,14 +1509,14 @@
     {:status 200
      :headers {"Content-Type" "text/html; charset=utf-8"}
      :body (pane-page role (pane-content root role) (query-value uri "project"))}
-    {:status 404 :body "Not found"}))
+    {:status 404 :body "找不到"}))
 
 (defn get-agent-pane [root uri]
   (if-let [role (agent-pane-role uri)]
     {:status 200
      :headers {"Content-Type" "text/plain; charset=utf-8"}
      :body (pane-content root role)}
-    {:status 404 :body "Not found"}))
+    {:status 404 :body "找不到"}))
 
 (defn request-project-root [forge uri]
   (if-not (forge/forge? forge)
@@ -1541,7 +1541,7 @@
                 (when (fs/regular-file? (pending-file proot id))
                   proot)))
             (forge/read-open-projects forge))
-      (throw (ex-info (str "Unknown approval: " id) {:http-status 404}))))
+      (throw (ex-info (str "未知的 approval：" id) {:http-status 404}))))
 
 (defn find-clar-root [forge id]
   (or (some (fn [name]
@@ -1549,7 +1549,7 @@
                 (when (fs/regular-file? (clar-pending-file proot id))
                   proot)))
             (forge/read-open-projects forge))
-      (throw (ex-info (str "Unknown clarification: " id) {:http-status 404}))))
+      (throw (ex-info (str "未知的 clarification：" id) {:http-status 404}))))
 
 (defn handle-get [root uri]
   (cond
@@ -1581,7 +1581,7 @@
     (= "/api/mission" (first (str/split (or uri "") #"\?")))
     (get-mission (request-project-root root uri))
 
-    :else {:status 404 :body "Not found"}))
+    :else {:status 404 :body "找不到"}))
 
 (defn confirm-teardown? [body]
   (let [text (str/trim (or body ""))]
@@ -1689,7 +1689,7 @@
        :body (json/generate-string {:ok true :status "teardown_started"})})
     {:status 400
      :headers {"Content-Type" "text/plain; charset=utf-8"}
-     :body "Teardown requires confirm=TEARDOWN (JSON {\"confirm\":\"TEARDOWN\"}).\n"}))
+     :body "停止 swarm 需要 confirm=TEARDOWN（JSON {\"confirm\":\"TEARDOWN\"}）。\n"}))
 
 (defn post-new-project [root body]
   (let [parsed (body-map body)
@@ -1712,7 +1712,7 @@
       (cond
         (not (str/blank? project)) (str (forge/project-dir root project))
         (not (str/blank? id)) (find-approval-root root id)
-        :else (throw (ex-info "Missing project" {:http-status 400}))))))
+        :else (throw (ex-info "缺少 project" {:http-status 400}))))))
 
 (defn scoped-clar-root [root uri]
   (if-not (forge/forge? root)
@@ -1735,14 +1735,14 @@
     (post-approval (scoped-approval-root root uri body) uri body)
     (str/starts-with? (or uri "") "/api/clarifications/")
     (post-clarification (scoped-clar-root root uri) uri body)
-    :else {:status 404 :body "Not found"}))
+    :else {:status 404 :body "找不到"}))
 
 (defn handle-request [root {:keys [method uri body]}]
   (try
     (case method
       "GET" (handle-get root uri)
       "POST" (handle-post root uri body)
-      {:status 404 :body "Not found"})
+      {:status 404 :body "找不到"})
     (catch Exception e
       (http-error (or (:http-status (ex-data e)) 500) (.getMessage e)))))
 

@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SwarmForge Pack</title>
+<title>SwarmForge Pack 控制台</title>
 <style>
 :root{--bg:#eef0eb;--panel:#fbfbf8;--ink:#1e221f;--muted:#68726c;--line:#d5d9d2;--line-soft:#e8ebe5;--accent:#3d5a45;--amber:#c9851a;--amber-bg:#fff6e5;--red:#9b1c1c;--green:#2f6b3a;--green-bg:#e7f3ea;--chip:#e8eee9;--card:#fffef9;--rail:340px;--card-min-w:148px;--card-min-h:72px;--card-max-w:200px;font-family:ui-sans-serif,system-ui,sans-serif}
 *{box-sizing:border-box}html,body{height:100%;margin:0}
@@ -135,23 +135,23 @@ header.top h1{margin:0;font-size:15px}.meta{color:var(--muted);font-size:12px}.m
   <header class="top">
     <div class="pack-identity">
       <h1 id="pack-title">SwarmForge</h1>
-      <button class="btn btn-danger btn-sm" type="button" id="teardown-btn">Teardown</button>
-      <span class="meta" id="pack-meta"><span class="dot">●</span> live</span>
+      <button class="btn btn-danger btn-sm" type="button" id="teardown-btn">停止</button>
+      <span class="meta" id="pack-meta"><span class="dot">●</span> 執行中</span>
     </div>
     <span class="spacer"></span>
     <div class="pack-actions">
-      <button class="btn btn-primary" type="button" id="btn-new-project">New Project</button>
+      <button class="btn btn-primary" type="button" id="btn-new-project">新增專案</button>
       <div class="menu" id="open-project-menu">
-        <button class="btn" type="button" id="btn-open-project">Open Project</button>
+        <button class="btn" type="button" id="btn-open-project">開啟專案</button>
         <div class="menu-list" id="open-project-list"></div>
       </div>
-      <button class="btn btn-primary" type="button" id="btn-new-task">New Task</button>
+      <button class="btn btn-primary" type="button" id="btn-new-task">新增任務</button>
     </div>
   </header>
   <p id="error" class="error"></p>
 
   <div class="attention" id="attention">
-    <div class="tag">Attention</div>
+    <div class="tag">需要注意</div>
     <div id="attention-rows">
       <div id="attention-approvals"></div>
       <div id="attention-clarifications"></div>
@@ -162,29 +162,29 @@ header.top h1{margin:0;font-size:15px}.meta{color:var(--muted);font-size:12px}.m
     <main class="board">
       <div class="columns" id="columns"></div>
     </main>
-    <div class="splitter" title="Drag to resize"></div>
+    <div class="splitter" title="拖曳以調整大小"></div>
     <aside class="rail">
       <section class="work-sec">
-        <h2>Work Queue</h2>
+        <h2>工作佇列</h2>
         <div class="work-wrap">
           <table class="work">
             <colgroup>
               <col class="c-story"><col class="c-role"><col class="c-state"><col class="c-age">
             </colgroup>
-            <thead><tr><th>Task</th><th>Role</th><th></th><th>Age</th></tr></thead>
+            <thead><tr><th>任務</th><th>角色</th><th></th><th>等待</th></tr></thead>
             <tbody id="work-rows"></tbody>
           </table>
         </div>
       </section>
-      <div class="rail-splitter" title="Drag to resize"></div>
+      <div class="rail-splitter" title="拖曳以調整大小"></div>
       <section class="ts">
         <div class="ts-head">
-          <h2 id="master-title">Master</h2>
-          <button class="btn btn-sm" type="button" id="btn-open-master-rail">Open</button>
+          <h2 id="master-title">主控</h2>
+          <button class="btn btn-sm" type="button" id="btn-open-master-rail">開啟</button>
         </div>
         <div class="history" id="chat-history"></div>
         <div class="composer">
-          <textarea id="chat-input" rows="4" placeholder="Follow-up… (Enter send · Shift+Enter newline)"></textarea>
+          <textarea id="chat-input" rows="4" placeholder="輸入後續訊息…（Enter 送出，Shift+Enter 換行）"></textarea>
         </div>
       </section>
     </aside>
@@ -193,14 +193,14 @@ header.top h1{margin:0;font-size:15px}.meta{color:var(--muted);font-size:12px}.m
 
 <div class="float-layer" id="reject-layer">
   <div class="float" role="dialog" aria-labelledby="rt-title">
-    <div class="titlebar" id="rt-title">Rejected task</div>
+    <div class="titlebar" id="rt-title">被退回的任務</div>
     <div class="body-pad">
-      <label for="rt-text">Comments</label>
-      <textarea id="rt-text" placeholder="Audit comments for retry…"></textarea>
+      <label for="rt-text">意見</label>
+      <textarea id="rt-text" placeholder="給重試用的審查意見…"></textarea>
       <div class="actions">
-        <button type="button" class="btn btn-danger" id="rt-delete">Delete</button>
-        <button type="button" class="btn btn-primary" id="rt-retry">Retry</button>
-        <button type="button" class="btn btn-approve" id="rt-accept">Accept Unchanged</button>
+        <button type="button" class="btn btn-danger" id="rt-delete">刪除</button>
+        <button type="button" class="btn btn-primary" id="rt-retry">重試</button>
+        <button type="button" class="btn btn-approve" id="rt-accept">接受原樣</button>
       </div>
     </div>
   </div>
@@ -208,21 +208,21 @@ header.top h1{margin:0;font-size:15px}.meta{color:var(--muted);font-size:12px}.m
 
 <div class="float-layer" id="new-project-layer">
   <div class="float" role="dialog" aria-labelledby="np-title" style="width:min(720px,94vw);min-width:min(560px,94vw)">
-    <div class="titlebar" id="np-title">New Project</div>
+    <div class="titlebar" id="np-title">新增專案</div>
     <div class="body-pad">
-      <label for="np-name">Name</label>
+      <label for="np-name">名稱</label>
       <input id="np-name" type="text" placeholder="my-app or owner/repo">
       <p class="inferred" id="np-inferred"></p>
-      <label class="toggle"><input type="checkbox" id="np-github"> github repo</label>
-      <label for="np-mission">Mission</label>
-      <textarea id="np-mission" placeholder="What this project is for…"></textarea>
+      <label class="toggle"><input type="checkbox" id="np-github"> GitHub repo</label>
+      <label for="np-mission">任務目標</label>
+      <textarea id="np-mission" placeholder="這個專案要完成什麼…"></textarea>
       <label>Pack</label>
       <div class="pack-radios" id="np-packs"></div>
-      <label for="np-conf">Config</label>
+      <label for="np-conf">設定</label>
       <textarea id="np-conf"></textarea>
       <div class="actions">
-        <button type="button" class="btn" id="np-cancel">Cancel</button>
-        <button type="button" class="btn btn-primary" id="np-ok">OK</button>
+        <button type="button" class="btn" id="np-cancel">取消</button>
+        <button type="button" class="btn btn-primary" id="np-ok">確定</button>
       </div>
     </div>
   </div>
@@ -230,16 +230,16 @@ header.top h1{margin:0;font-size:15px}.meta{color:var(--muted);font-size:12px}.m
 
 <div class="float-layer" id="new-task-layer">
   <div class="float" role="dialog" aria-labelledby="nt-title">
-    <div class="titlebar" id="nt-title">New Task</div>
+    <div class="titlebar" id="nt-title">新增任務</div>
     <div class="body-pad">
-      <p class="note">Creates a card in the master lane and sends name + text to the master agent.</p>
-      <label for="nt-name">Name</label>
+      <p class="note">在 master lane 建立一張卡片，並把名稱與內容送給 master agent。</p>
+      <label for="nt-name">名稱</label>
       <input id="nt-name" type="text" placeholder="task-name">
-      <label for="nt-text">Task</label>
-      <textarea id="nt-text" placeholder="What the master agent should do…"></textarea>
+      <label for="nt-text">任務</label>
+      <textarea id="nt-text" placeholder="希望 master agent 做什麼…"></textarea>
       <div class="actions">
-        <button type="button" class="btn" id="nt-cancel">Cancel</button>
-        <button type="button" class="btn btn-primary" id="nt-ok">OK</button>
+        <button type="button" class="btn" id="nt-cancel">取消</button>
+        <button type="button" class="btn btn-primary" id="nt-ok">確定</button>
       </div>
     </div>
   </div>
@@ -257,7 +257,7 @@ function cardEl(task, opts) {
   const thin = opts && opts.thin;
   const card = document.createElement("article");
   card.className = thin ? "card card-thin" : "card";
-  if (task.status === "REJECTED") card.classList.add("card-rejected");
+  if (task.status === "已退回") card.classList.add("card-rejected");
   if (task.merging) card.classList.add("card-merging");
   card.setAttribute("data-task-name", task.name || "");
   if (task.merging) card.setAttribute("data-merging", "true");
@@ -269,12 +269,12 @@ function cardEl(task, opts) {
   title.appendChild(name);
   const audit = document.createElement("span");
   audit.className = "audit-count";
-  audit.title = "Audit count: " + (task.audit_count || 0);
+  audit.title = "審查次數：" + (task.audit_count || 0);
   const auditIcon = document.createElement("span");
   auditIcon.className = "audit-icon";
   auditIcon.setAttribute("role", "img");
-  auditIcon.setAttribute("aria-label", "Audit count");
-  auditIcon.title = "Audit count";
+  auditIcon.setAttribute("aria-label", "審查次數");
+  auditIcon.title = "審查次數";
   auditIcon.textContent = "\u2713";
   const auditValue = document.createElement("span");
   auditValue.textContent = String(task.audit_count || 0);
@@ -341,12 +341,12 @@ function projectBand(proj) {
   const nt = document.createElement("button");
   nt.type = "button";
   nt.className = "btn btn-primary btn-sm";
-  nt.textContent = "New Task";
+  nt.textContent = "新增任務";
   nt.onclick = () => openNewTask(proj.name);
   const cl = document.createElement("button");
   cl.type = "button";
   cl.className = "btn btn-sm";
-  cl.textContent = "Close";
+  cl.textContent = "關閉";
   cl.onclick = () => closeProject(proj.name);
   header.append(title, nt, cl);
   const cols = document.createElement("div");
@@ -389,7 +389,7 @@ function fillOpenMenu() {
   allProjects.forEach((name) => {
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.textContent = name + (openProjects.indexOf(name) >= 0 ? " (open)" : "");
+    btn.textContent = name + (openProjects.indexOf(name) >= 0 ? "（已開啟）" : "");
     btn.onclick = (event) => {
       event.stopPropagation();
       $("open-project-menu").classList.remove("open");
@@ -400,7 +400,7 @@ function fillOpenMenu() {
   if (!allProjects.length) {
     const empty = document.createElement("div");
     empty.className = "batch-item";
-    empty.textContent = "No projects";
+    empty.textContent = "沒有專案";
     list.appendChild(empty);
   }
 }
@@ -423,8 +423,8 @@ function renderChrome(data) {
   const dot = document.createElement("span");
   dot.className = "dot";
   dot.textContent = "●";
-  $("pack-meta").append(dot, " live · master = " + master);
-  $("btn-open-master-rail").textContent = "Open " + master;
+  $("pack-meta").append(dot, " 執行中 · master = " + master);
+  $("btn-open-master-rail").textContent = "開啟 " + master;
   $("btn-open-master-rail").setAttribute("data-open-agent", masterRole);
   $("master-title").textContent = master;
 }
@@ -452,13 +452,13 @@ function stateIcon(state) {
   const ico = document.createElement("span");
   if (state === "live") {
     ico.className = "st-ico dot-green";
-    ico.title = "live";
+    ico.title = "執行中";
   } else if (state === "idle") {
     ico.className = "st-ico dot-yellow";
-    ico.title = "idle";
+    ico.title = "閒置";
   } else {
     ico.className = "st-ico";
-    ico.title = "no session";
+    ico.title = "沒有 session";
   }
   return ico;
 }
@@ -504,7 +504,7 @@ function workRow(item) {
   link.className = "linkish";
   link.setAttribute("data-open-agent", item.role || "");
   if (item.project) link.setAttribute("data-open-project", item.project);
-  link.title = "open " + (item.role || "") + " session";
+  link.title = "開啟 " + (item.role || "") + " session";
   link.textContent = item.role || "";
   const therm = document.createElement("span");
   const heat = Number(item.activity) || 0;
@@ -535,7 +535,7 @@ function renderWork(data) {
       h.textContent = proj.name || "";
       const table = document.createElement("table");
       table.className = "work";
-      table.innerHTML = "<thead><tr><th>Task</th><th>Role</th><th></th><th>Age</th></tr></thead>";
+      table.innerHTML = "<thead><tr><th>任務</th><th>角色</th><th></th><th>等待</th></tr></thead>";
       const tbody = document.createElement("tbody");
       (proj.work_in_flight || []).forEach((item) => tbody.appendChild(workRow(item)));
       table.appendChild(tbody);
@@ -604,7 +604,7 @@ function renderDiffLines(lines) {
 
 function renderHistory(history) {
   if (!history || !history.length) {
-    return "<div class=\"hist-empty\">No previous comments</div>";
+    return "<div class=\"hist-empty\">沒有先前意見</div>";
   }
   return history.map((item) => {
     const at = escapeHtml(item.at || "");
@@ -647,7 +647,7 @@ function fillDocWindow(win, name, data) {
   const emptyHist = !history.length;
   win.document.open();
   win.document.write(
-    "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>" +
+    "<!doctype html><html lang=\"zh-Hant\"><head><meta charset=\"utf-8\"><title>" +
     escapeHtml(name) + "</title>" +
     "<style>html,body{height:100%;margin:0;display:flex;flex-direction:column;background:#f8f8f5;color:#1e221f;font-family:ui-sans-serif,system-ui,sans-serif}" +
     "header{display:flex;align-items:center;gap:8px;padding:8px 10px;background:linear-gradient(180deg,#eceee8,#e0e3dc);border-bottom:1px solid #d5d9d2;flex:0 0 auto}" +
@@ -671,17 +671,17 @@ function fillDocWindow(win, name, data) {
     "#doc-save{background:#3d5a45;border-color:#3d5a45;color:#fff}</style></head><body>" +
     "<header><h1>" + escapeHtml(name) + "</h1>" +
     "<label class=\"toggle\"><input type=\"checkbox\" id=\"doc-diff\"" +
-    (hasDiff ? "" : " disabled") + "> Diff</label></header>" +
+    (hasDiff ? "" : " disabled") + "> 差異</label></header>" +
     "<pre id=\"doc-body\">" + escapeHtml(text) + "</pre>" +
-    "<div class=\"doc-split\" id=\"doc-split-body\" title=\"Drag to resize\"></div>" +
+    "<div class=\"doc-split\" id=\"doc-split-body\" title=\"拖曳以調整大小\"></div>" +
     "<div id=\"doc-history\"" + (emptyHist ? " class=\"empty\"" : "") + ">" +
     renderHistory(history) + "</div>" +
-    "<div class=\"doc-split\" id=\"doc-split-hist\" title=\"Drag to resize\"></div>" +
-    "<div class=\"comments\" id=\"doc-comments-pane\"><label for=\"doc-comments\">New comment</label>" +
+    "<div class=\"doc-split\" id=\"doc-split-hist\" title=\"拖曳以調整大小\"></div>" +
+    "<div class=\"comments\" id=\"doc-comments-pane\"><label for=\"doc-comments\">新增意見</label>" +
     "<textarea id=\"doc-comments\"></textarea>" +
     "<div class=\"actions\">" +
-    "<button type=\"button\" id=\"doc-cancel\">Cancel</button>" +
-    "<button type=\"button\" id=\"doc-save\">Save</button></div></div>" +
+    "<button type=\"button\" id=\"doc-cancel\">取消</button>" +
+    "<button type=\"button\" id=\"doc-save\">儲存</button></div></div>" +
     "</body></html>"
   );
   win.document.close();
@@ -708,15 +708,15 @@ function docMark(path, reviews) {
   mark.className = "doc-mark";
   if (!reviews || !Object.prototype.hasOwnProperty.call(reviews, path)) {
     mark.textContent = "\u2610";
-    mark.title = "Not read";
+    mark.title = "尚未閱讀";
   } else if (!String(reviews[path] || "").trim()) {
     mark.className += " doc-mark-ok";
     mark.textContent = "\u2713";
-    mark.title = "No comments";
+    mark.title = "沒有意見";
   } else {
     mark.className += " doc-mark-bad";
     mark.textContent = "\u2717";
-    mark.title = "Has comments";
+    mark.title = "有意見";
   }
   return mark;
 }
@@ -726,7 +726,7 @@ async function viewDoc(path, approvalId, project) {
     (approvalId ? "&id=" + encodeURIComponent(approvalId) : "") +
     (project ? "&project=" + encodeURIComponent(project) : "");
   const res = await fetch(qs);
-  const data = res.ok ? await res.json() : {text: "Not found", history: [], has_diff: false, lines: []};
+  const data = res.ok ? await res.json() : {text: "找不到", history: [], has_diff: false, lines: []};
   const name = fileName(path);
   const win = window.open("about:blank", "doc-" + encodeURIComponent(path) + "-" + Date.now(), "resizable=yes,scrollbars=yes,width=780,height=640");
   if (!win) return;
@@ -757,7 +757,7 @@ function artifactMenu(paths, item) {
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = "btn btn-sm";
-  btn.textContent = "Documents";
+  btn.textContent = "文件";
   const list = document.createElement("div");
   list.className = "menu-list";
   (paths || []).forEach((path) => {
@@ -865,16 +865,16 @@ function attentionRow(item) {
   row.className = "att-row";
   const pill = document.createElement("span");
   pill.className = "pill pill-warn";
-  pill.textContent = "Approval";
+  pill.textContent = "待核准";
   const summary = attentionWorkPair(item.project, item.task);
   row.append(pill, summary);
   if ((item.artifacts || []).length) row.appendChild(artifactMenu(item.artifacts, item));
   const reject = document.createElement("button");
   reject.type = "button";
   reject.className = "btn btn-sm";
-  reject.textContent = "Reject";
+  reject.textContent = "退回";
   reject.onclick = () => openRejectDialog(item);
-  const approve = approvalButton(item, "approve", "Approve", "btn btn-sm btn-approve");
+  const approve = approvalButton(item, "approve", "核准", "btn btn-sm btn-approve");
   approve.disabled = hasRemedialComments(item);
   row.append(approve, reject);
   return row;
@@ -885,7 +885,7 @@ function fillClarWindow(win, item) {
   const draft = clarDrafts[item.id] || "";
   win.document.open();
   win.document.write(
-    "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>Clarification</title>" +
+    "<!doctype html><html lang=\"zh-Hant\"><head><meta charset=\"utf-8\"><title>澄清問題</title>" +
     "<style>html,body{height:100%;margin:0;display:flex;flex-direction:column;background:#f8f8f5;color:#1e221f;font-family:ui-sans-serif,system-ui,sans-serif}" +
     "header{flex:0 0 auto;padding:8px 10px;background:linear-gradient(180deg,#eceee8,#e0e3dc);border-bottom:1px solid #d5d9d2;font-weight:600;font-size:13px}" +
     "#clar-request{flex:1 1 50%;min-height:4rem;margin:0;padding:12px;overflow:auto;white-space:pre-wrap;background:#fffef9;font:13px/1.45 ui-sans-serif,system-ui,sans-serif}" +
@@ -897,12 +897,12 @@ function fillClarWindow(win, item) {
     ".actions{display:flex;justify-content:flex-end}" +
     "button{border:1px solid #9aa59e;background:#3d5a45;border-color:#3d5a45;color:#fff;padding:5px 12px;border-radius:7px;font-size:12px;cursor:pointer}" +
     "</style></head><body>" +
-    "<header>Clarification requested from: " + escapeHtml(item.role || "agent") + "</header>" +
+    "<header>需要澄清，來源：" + escapeHtml(item.role || "agent") + "</header>" +
     "<pre id=\"clar-request\">" + escapeHtml(request) + "</pre>" +
-    "<div class=\"doc-split\" id=\"clar-split\" title=\"Drag to resize\"></div>" +
-    "<div id=\"clar-response-pane\"><label for=\"clar-response\">Response</label>" +
+    "<div class=\"doc-split\" id=\"clar-split\" title=\"拖曳以調整大小\"></div>" +
+    "<div id=\"clar-response-pane\"><label for=\"clar-response\">回覆</label>" +
     "<textarea id=\"clar-response\">" + escapeHtml(draft) + "</textarea>" +
-    "<div class=\"actions\"><button type=\"button\" id=\"clar-ok\">OK</button></div></div>" +
+    "<div class=\"actions\"><button type=\"button\" id=\"clar-ok\">確定</button></div></div>" +
     "</body></html>"
   );
   win.document.close();
@@ -930,13 +930,13 @@ function clarificationRow(item) {
   row.className = "att-row";
   const pill = document.createElement("span");
   pill.className = "pill pill-warn";
-  pill.textContent = "Clarification requested from: " + (item.role || "agent");
+  pill.textContent = "需要澄清，來源：" + (item.role || "agent");
   const pair = attentionWorkPair(item.project, item.task);
   const summary = document.createElement("span");
   summary.textContent = item.body || "";
   const input = document.createElement("input");
   input.type = "text";
-  input.placeholder = "Answer…";
+  input.placeholder = "輸入回答…";
   input.dataset.clarId = item.id || "";
   input.value = clarDrafts[item.id] || "";
   input.addEventListener("input", () => {
@@ -945,7 +945,7 @@ function clarificationRow(item) {
   const open = document.createElement("button");
   open.type = "button";
   open.className = "btn btn-sm";
-  open.textContent = "Open";
+  open.textContent = "開啟";
   open.onclick = (event) => {
     event.preventDefault();
     openClarification(item);
@@ -953,7 +953,7 @@ function clarificationRow(item) {
   const send = document.createElement("button");
   send.type = "submit";
   send.className = "btn btn-sm btn-primary";
-  send.textContent = "Submit";
+  send.textContent = "送出";
   row.addEventListener("submit", (event) => {
     event.preventDefault();
     postClarification(item.id, input.value);
@@ -1013,7 +1013,7 @@ async function loadState() {
     renderWork(data);
     renderChat(data);
   } catch (_) {
-    $("error").textContent = "Swarm disconnected";
+    $("error").textContent = "Swarm 已斷線";
   }
 }
 
@@ -1041,7 +1041,7 @@ function updateInferred() {
     name = raw.replace(/\.git$/, "").replace(/^https?:\/\/github.com\//, "");
     name = name.split("/").filter(Boolean).pop() || name;
   }
-  $("np-inferred").textContent = github && name ? "Directory: " + name : "";
+  $("np-inferred").textContent = github && name ? "資料夾：" + name : "";
 }
 
 function fillPackRadios() {
@@ -1080,7 +1080,7 @@ function openNewProject() {
   $("np-mission").value = "";
   updateInferred();
   $("np-ok").disabled = false;
-  $("np-ok").textContent = "OK";
+  $("np-ok").textContent = "確定";
   $("new-project-layer").classList.add("open");
   $("np-name").focus();
 }
@@ -1093,17 +1093,17 @@ async function submitNewProject() {
   const name = $("np-name").value.trim();
   const pack = selectedPack() || (forgePacks[0] && forgePacks[0].name) || "";
   if (!name) {
-    alert("Name is required.");
+    alert("請輸入名稱。");
     $("np-name").focus();
     return;
   }
   if (!pack) {
-    alert("No pack is available. Run get-swarm-forge so packs/ has two-pack, four-pack, or six-pack.");
+    alert("目前沒有可用的 pack。請執行 get-swarm-forge，讓 packs/ 內有 two-pack、four-pack 或 six-pack。");
     return;
   }
   const btn = $("np-ok");
   btn.disabled = true;
-  btn.textContent = "Creating…";
+  btn.textContent = "建立中…";
   try {
     const res = await fetch("/api/projects", {
       method: "POST",
@@ -1117,7 +1117,7 @@ async function submitNewProject() {
       })
     });
     if (!res.ok) {
-      let msg = "Could not create project";
+      let msg = "無法建立專案";
       try { msg = (await res.json()).error || msg; } catch (_) {}
       alert(msg);
       return;
@@ -1125,10 +1125,10 @@ async function submitNewProject() {
     closeNewProject();
     loadState();
   } catch (err) {
-    alert("Could not create project: " + (err && err.message ? err.message : err));
+    alert("無法建立專案：" + (err && err.message ? err.message : err));
   } finally {
     btn.disabled = false;
-    btn.textContent = "OK";
+    btn.textContent = "確定";
   }
 }
 
@@ -1139,7 +1139,7 @@ async function openProject(name) {
     body: JSON.stringify({name})
   });
   if (!res.ok) {
-    let msg = "Could not open project";
+    let msg = "無法開啟專案";
     try { msg = (await res.json()).error || msg; } catch (_) {}
     alert(msg);
     return;
@@ -1154,7 +1154,7 @@ async function closeProject(name) {
     body: JSON.stringify({name})
   });
   if (!res.ok) {
-    let msg = "Could not close project";
+    let msg = "無法關閉專案";
     try { msg = (await res.json()).error || msg; } catch (_) {}
     alert(msg);
     return;
@@ -1174,7 +1174,7 @@ async function submitNewTask() {
     body: JSON.stringify(payload)
   });
   if (!res.ok) {
-    let msg = "Could not create task";
+    let msg = "無法建立任務";
     try {
       const body = await res.json();
       msg = body.error || msg;
@@ -1213,7 +1213,7 @@ function openRejectDialog(item) {
   rejectApprovalId = item && item.id ? item.id : "";
   rejectApprovalProject = (item && item.project) || "";
   rejectHasComments = hasRemedialComments(item);
-  $("rt-title").textContent = (item && item.task) || "Rejected task";
+  $("rt-title").textContent = (item && item.task) || "被退回的任務";
   $("rt-text").value = "";
   $("reject-layer").classList.add("open");
 }
@@ -1246,7 +1246,7 @@ async function deleteRejected() {
 
 async function acceptRejected() {
   if (!rejectApprovalId) return;
-  if (rejectHasComments && !confirm("Remedial comments will be ignored.")) return;
+  if (rejectHasComments && !confirm("補救意見將會被忽略。")) return;
   await fetch("/api/approvals/" + encodeURIComponent(rejectApprovalId) + "/approve", {method: "POST"});
   closeRejectDialog();
   loadState();
@@ -1304,11 +1304,11 @@ async function openMission(project) {
   if (!win) return;
   win.document.open();
   win.document.write(
-    "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>Mission</title>" +
+    "<!doctype html><html lang=\"zh-Hant\"><head><meta charset=\"utf-8\"><title>任務目標</title>" +
     "<style>html,body{height:100%;margin:0;display:flex;flex-direction:column;background:#f8f8f5;color:#1e221f;font-family:ui-sans-serif,system-ui,sans-serif}" +
     "header{flex:0 0 auto;padding:8px 10px;background:linear-gradient(180deg,#eceee8,#e0e3dc);border-bottom:1px solid #d5d9d2;font-weight:600;font-size:13px}" +
     "pre{flex:1 1 auto;margin:0;padding:12px;overflow:auto;white-space:pre-wrap;background:#fffef9;font:13px/1.45 ui-sans-serif,system-ui,sans-serif}</style></head><body>" +
-    "<header>" + escapeHtml(project || "Mission") + "</header>" +
+    "<header>" + escapeHtml(project || "任務目標") + "</header>" +
     "<pre id=\"mission-body\">" + escapeHtml(text) + "</pre></body></html>"
   );
   win.document.close();
@@ -1419,11 +1419,11 @@ async function sendChat() {
 }
 
 async function teardownSwarm() {
-  if (!confirm("Stop this swarm? Agent sessions and tmux windows will be terminated. Project files stay on disk.")) return;
+  if (!confirm("要停止這個 swarm 嗎？Agent sessions 和 tmux windows 會被結束，但專案檔案會保留在磁碟上。")) return;
   const btn = $("teardown-btn");
   if (btn) {
     btn.disabled = true;
-    btn.textContent = "Tearing down…";
+    btn.textContent = "停止中…";
   }
   try {
     await fetch("/api/teardown", {
@@ -1431,11 +1431,11 @@ async function teardownSwarm() {
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({confirm: "TEARDOWN"})
     });
-    $("pack-meta").textContent = "Swarm teardown started — this page will go offline.";
+    $("pack-meta").textContent = "Swarm 已開始停止，這個頁面稍後會離線。";
   } catch (_) {
     if (btn) {
       btn.disabled = false;
-      btn.textContent = "Teardown";
+      btn.textContent = "停止";
     }
   }
 }
