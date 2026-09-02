@@ -1,34 +1,28 @@
 # Project Rules
 
 ## Project Shape
-- This project is configured for SwarmForge with two Codex-backed agents:
-  coder and cleaner.
-- The coder is the master worktree role.
-- Project language: Babashka.
+- 此專案已設定為使用 SwarmForge，包含兩個 Codex-backed agents：
+  coder 和 cleaner。
+- coder 是 master worktree role。
+- Project language：Babashka。
 
 ## Local Configuration
-- Preserve project-local SwarmForge configuration under `swarmforge/`.
-- Keep swarm state local under `.swarmforge/`, worktrees under `.worktrees/`,
-  and shared scripts under `swarmforge/scripts/`.
+- 保留 `swarmforge/` 底下的 project-local SwarmForge configuration。
+- 將 swarm state 保持在 `.swarmforge/`，worktrees 保持在 `.worktrees/`，
+  shared scripts 保持在 `swarmforge/scripts/`。
 
 ## Workflow
-- The cleaner receives coder handoffs in batch mode.
-- Do not create or use Gherkin, IR, acceptance tests, Gherkin mutation, or
-  property tests.
-- Use unit tests and language-local verification only.
+- cleaner 會以 batch mode 接收 coder handoffs。
+- 不要建立或使用 Gherkin、IR、acceptance tests、Gherkin mutation 或
+  property tests。
+- 只使用 unit tests 與 language-local verification。
 
 ## Handoffs
-- Prefer terse, explicit handoffs that report state and request
-  role-appropriate review.
-- Do not include sender process narrative.
+- 優先使用簡短、明確的 handoffs，回報 state 並請求符合角色職責的 review。
+- 不要包含 sender process narrative。
 
 ## Cleaner Handoffs
-- When a helper-delivered task is from cleaner, `ready_for_next.sh` has
-  already merged that commit. Run unit tests and fix any failures. Then run
-  `done_with_current.sh`. Do not send a `git_handoff` downstream. Do not
-  invent `git merge`. Apart from verification, do not apply other
-  role-specific work to that cleaner handoff.
+- 當 helper-delivered task 來自 cleaner 時，`ready_for_next.sh` 已經合併該 commit。執行 unit tests 並修正任何 failures。然後執行 `done_with_current.sh`。不要向 downstream 送出 `git_handoff`。不要發明 `git merge`。除了 verification 之外，不要對該 cleaner handoff 套用其他 role-specific work。
 
 ## Ownership
-- Do not change another role's prompt or workflow ownership without explicit
-  user direction.
+- 沒有 explicit user direction 時，不要變更另一個 role 的 prompt 或 workflow ownership。
