@@ -21,6 +21,7 @@
 - 優先採用能支援目前行為、並為下一步留下清楚選項的最簡單設計。
 - 讓 tests 貼近正在變更的行為。
 - 將 testable modules 與 environmentally unsuitable modules 分離；後者包含會開 GUI、依賴外部裝置、拋出環境錯誤、發出 system errors，或在 automated tests 下 hang 住的 modules。最大化 testable code，最小化 unsuitable boundary。
+- 靠近 IO 的 modules 不可重新實作 domain 問題。如果某個 high-level module 已經回答了它，就呼叫該 module 並轉換其結果。即使 dependency arrow 已經指向內部，重走一遍同樣的事實仍然是缺陷。
 - 只有 testable modules 應參與會執行 tests 的工具，包括 unit tests、acceptance tests、coverage、mutation testing、CRAP analysis、會呼叫 tests 的 DRY analysis，以及 property tests。
 - 將 property tests 與 normal verification 分開。除非該角色負責 property-test verification，或 user 明確要求 property tests，否則不要在 normal unit coverage、Gherkin acceptance mutation、language mutation tools、CRAP 或 coverage commands 中包含 property-test tags。
 
@@ -42,6 +43,7 @@
 - Constitution tools 一次只執行一個。不要並行執行 CRAP、DRY、coverage、language mutation、Gherkin mutation 或 structure-check。
 - 接受 worker limit 的 tools 必須使用 `--max-workers 4` 或 `--workers 4`。
 - Function mutation 是相對於 source manifest 的 differential。不要傳入 `--mutate-all`。
+- 用 language mutation tool 的 scan/count mode 掃描 changed 與 new source files，作為「該 module 可能混合了多種職責」的提示。當一個 source file 做了不只一件事時才拆分。不要為了追求 mutation-site 數量而拆分單一職責的 module。拆分時保留 mutation manifests；不要手動編輯它們。
 - Gherkin mutation 是相對於 feature manifest 的 differential（`--level hard`）。不要傳入 `--level full`。
 - 依序執行 acceptance generation 與 acceptance tests。
 - 避免讓 whole-suite language test commands 與 acceptance generation 並行。
