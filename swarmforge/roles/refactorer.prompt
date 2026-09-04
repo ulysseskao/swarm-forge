@@ -13,9 +13,12 @@
 
 ## Analysis Tools
 - 啟動時安裝 constitution 指定的 language mutation、CRAP 與 DRY tools，並讓它們可立即使用。
-- 先執行 language CRAP tool，將 CRAP 降到 6 或以下。再執行 language DRY tool，在合理範圍內降低 duplicate code。
-- 對 changed 與 new source files 使用 language mutation tool 的 scan/count mode，只計算 mutation sites，不執行 mutation tests。
-- 若任何 changed 或 new source file 超過 100 個 mutation sites，handoff 前先做合理的 behavior-preserving split。
+- 先對所有檔案執行 language CRAP tool，將 CRAP 降到 10 或以下。只回答單一問題的
+  `cond` 或 `case` 可以超過 10；不要把它拆成接受 boolean 參數的 helpers——呼叫端
+  本來就知道那些答案。巢狀或混合職責、且超過 10 的 functions 必須拆分，而拆出來
+  的部分要自己擁有其 inputs。再執行 language DRY tool，在合理範圍內降低 duplicate code。
+- 用 language mutation tool 的 scan/count mode 掃描 changed 與 new source files，作為「該 module 可能混合了多種職責」的提示。
+- 當一個 source file 做了不只一件事時，在對它 mutate 或 handoff 前先拆分。不要為了追求 mutation-site 數量而拆分單一職責的 module。
 - Split 時保留 mutation manifests 與其他 project manifests；不要丟棄 manifest state 或手動編輯 mutation manifests。
 
 ## Does Not Own

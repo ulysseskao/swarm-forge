@@ -9,9 +9,12 @@
 - 檢查 module structure，並進行合理 reorganizations，以最小化 coupling、最大化 cohesion 並維持 information hiding。拆分混合無關 behaviors 或模糊重要 technical boundaries 的 modules。
 - 設計 boundaries，使 testable modules 最大化，environmentally unsuitable adapter shells 最小化。
 - Tests 與 test helpers 要分開。
+- Adapters 與其他靠近 IO 的 modules 不可重新實作 domain 問題。如果某個 high-level module 已經回答了它，就呼叫該 module，並把結果轉換成 UI、文案、bytes 或 transport。即使 dependency arrow 已經指向內部，重走一遍同樣的事實仍然是缺陷。
+- 若某個 high-level module 只為了測試而存在、實際上卻由 adapter 重新實作，那就是缺陷。要嘛把 adapter 接上去，要嘛刪掉那段沒用到的 policy。
+- 列出允許依賴的 automated architecture checks 描述的是「預期的結構」，不是既成事實。如果正確的修法是往內呼叫，就修改那些 pin；不要把目前的 dependency graph 當成不可更動。
 
 ## Architectural Review Phases
-- UI/Core Separation：review UI、framework、IO 與 delivery details 是否和 core rules 分離，以及 core behavior 是否能在沒有 UI 或 IO 時被測試。
+- UI/Core Separation：review UI、framework、IO 與 delivery details 是否和 core rules 分離，以及 core behavior 是否能在沒有 UI 或 IO 時被測試。對於 UI 從 application state 呈現的每個 observable，找出那個已經知道答案的 domain function。UI 應該去問那個 function，而不是重做規則。
 - Dependency Rule：review dependency direction。遠離 IO 的 high-level modules 不得依賴靠近 IO 的 low-level modules；low-level modules 應透過 stable abstractions 或 inward calls 依賴 high-level modules。
 - Information Hiding And Encapsulation：review modules 是否只暴露必要 concepts、隱藏 representation 與 IO details、維持 invariants，並避免跨 boundaries 洩漏 framework 或 persistence structures。
 - Local Code Quality：review names、control flow、duplication、error handling、edge cases 與 local readability，因為它們會影響 architectural clarity。
@@ -23,6 +26,9 @@
 - Build `gherkin-mutator` 所需的 project-specific runner adapter。
 
 ## Mutation Work
+- 用 language mutation tool 的 scan/count mode 掃描 changed 與 new source files，作為「該 module 可能混合了多種職責」的提示。
+- 當一個 source file 做了不只一件事時，在對它 mutate 或 handoff 前先拆分。不要為了追求 mutation-site 數量而拆分單一職責的 module。
+- 拆分時保留 mutation manifests 與其他 project manifests；不要丟棄 manifest state 或手動編輯 mutation manifests。
 - 依序對每個 file 執行 language mutation tool，一次一個 file。
 - 除非明確指示，永遠使用相對於 manifest 的 differential mutation。
 - Mutation work 時時間很重要；在維持 meaningful coverage 與 manifest correctness 的前提下，讓 mutation runs 盡可能有效率。
@@ -43,13 +49,12 @@
 - 在每個 refactorer handoff 中，套用關於 coupling、cohesion、information hiding、technical boundaries 與 testable boundaries 的 module-structure rules；實作合理的 structural fixes。
 
 ## Handoff
-- 如果 handoff 沒有 changes，不要交給其他 agents。
-- 除非另有指示，final verification sequence 依序執行 language mutation tool、language DRY tool、soft Gherkin acceptance mutation（`--level soft`）。每個 tool 發現的 issues 都要先修正，再執行下一個。
+- 除非另有指示，final verification sequence 依序執行 language mutation tool、language DRY tool，以及在 `features/*.feature` 存在時執行 soft Gherkin acceptance mutation（`--level soft`）。如果沒有 feature files，就跳過 `gherkin-mutator`，不要視為失敗。Manifest edits 仍然要 forward。Handbacks 只做 merge；不要重新 forward。每個 tool 發現的 issues 都要先修正，再執行下一個。
 - 收到 notify 或 restart 時，執行 `ready_for_next.sh`。它會合併 inbound `git_handoff`。不要發明 `git merge`。
 - 當目前 refactorer task 或 batch 完成時，先 commit architectural changes 並 hand off functional work，再接下一個 queued refactorer task 或 batch：
   - 當 coder 與 refactorer 有 follow-up work 要 review 時，送 `git_handoff` 給 coder 和 refactorer，使用 `priority: 00`。
   - 只有當有 functional commit 需要 specifier review 時，才送 `git_handoff` 給 specifier。
   - 每個 handoff 都使用 `swarm_handoff.sh <draft-file>` 排入佇列。Draft headers 只能有 `type`、`to`、`priority`、`task`。不要手打 SHA 或 `SWARMFORGE_ROLE`。
   - 不要送 completion notes 或 `note` handoffs 給 specifier。
-  - 如果完成的工作沒有產生 changes，或只有 manifest/non-functional changes，執行 `done_with_current.sh`，並直接接下一個 queued task 或 batch，不 forward。
+  - Handbacks（`non-forwarding`）只做 merge；不要重新 forward。Manifest edits 仍然要 forward。
 - Forwarded `git_handoff` 之後，執行 `done_with_current.sh`。
