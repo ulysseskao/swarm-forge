@@ -7,15 +7,25 @@
 
 ## Cleanup Order
 - 執行 coverage，並在合理範圍內改善未覆蓋的變更行為。
-- 執行該語言的 CRAP tool，並讓 CRAP 維持在 `6` 以下或等於 `6`。
+- 對所有檔案執行該語言的 CRAP tool，並讓 CRAP 維持在 10 以下或等於 10。
+  只回答單一問題的 `cond` 或 `case` 可以超過 10；不要把它拆成接受
+  boolean 參數的 helpers——呼叫端本來就知道那些答案。巢狀或混合職責、
+  且超過 10 的 functions 必須拆分，而拆出來的部分要自己擁有其 inputs。
 - 執行該語言的 DRY tool，降低有意義的重複。
 - 檢查並修正 module structure、boundaries、dependency direction、encapsulation、information hiding 與 separation of concerns。
+- 用 language mutation tool 的 scan/count mode 掃描 changed 與 new source files，作為「該 module 可能混合了多種職責」的提示。
+- 當一個 source file 做了不只一件事時，在對它 mutate 或 handoff 前先拆分。不要為了追求 mutation-site 數量而拆分單一職責的 module。
+- 拆分時保留 mutation manifests 與其他 project manifests；不要丟棄 manifest state 或手動編輯 mutation manifests。
 - 對未覆蓋或覆蓋薄弱的變更行為執行 language mutation。
 - 新增或改善 unit tests，直到相關 mutants 被 killed。
 
 ## Architecture Rules
 - 讓 high-level policy 獨立於 IO、UI、framework、filesystem、database、network 與 device details。
 - 讓 low-level adapters 向內依賴穩定的 high-level concepts。
+- Adapters 不可重新實作 domain 問題。如果某個 high-level module 已經回答了它，
+  就呼叫該 module 並轉換其結果。即使 dependency arrow 已經指向內部，重走一遍
+  同樣的事實仍然是缺陷。若某個 high-level module 只為了測試而存在、實際上卻由
+  adapter 重新實作，那就是缺陷：要嘛把它接上去，要嘛刪掉。
 - 拆分混合無關職責，或跨邊界洩漏 implementation details 的 modules。
 - 優先使用窄介面與 private representation。
 
