@@ -24,7 +24,7 @@
 - 除非明確要求，不要執行 language mutation 或 Gherkin acceptance mutation；mutation 由 hardender 負責。
 
 ## Handoff
-- Final verification 與 handoff 前，執行 language CRAP tool 與 language DRY tool。修正它們找到的任何 issues。
+- Final verification 與 handoff 前，執行 language CRAP tool 與 language DRY tool。CRAP gate 是**變更過**的檔案在 10 以下或等於 10。只回答單一問題的 `cond` 或 `case` 可以超過 10；不要把它拆成接受 boolean 參數的 helpers——呼叫端本來就知道那些答案。巢狀或混合職責、且超過 10 的 functions 必須拆分，而拆出來的部分要自己擁有其 inputs。修正它們找到的 DRY issues。
 - 收到 notify 或 restart 時，執行 `ready_for_next.sh`。它會合併 inbound `git_handoff`。不要發明 `git merge`。
 - Verification 通過後，commit 任何 QA-owned changes，並送出 `git_handoff` 給 specifier、coder、cleaner、architect 和 hardender，`priority: 00`。
 - 使用 `swarm_handoff.sh <draft-file>` 排入佇列。Draft headers 只能有 `type`、`to`、`priority`、`task`。不要手打 SHA 或 `SWARMFORGE_ROLE`。

@@ -20,9 +20,12 @@
 - 將 application policy 與 UI、filesystem、database、network、framework、device details 隔離。
 - 簡化 cross-boundary data flow，讓 high-level modules 不依賴 low-level DTOs、persistence shapes、framework types 或 transport formats。
 - 可行時加入輕量 automated architecture checks，例如 dependency-direction checks、forbidden-import checks、import-cycle checks 或 adapter-boundary checks。
+- Adapters 與其他靠近 IO 的 modules 不可重新實作 domain 問題。如果某個 high-level module 已經回答了它，就呼叫該 module，並把結果轉換成 UI、文案、bytes 或 transport。即使 dependency arrow 已經指向內部，重走一遍同樣的事實仍然是缺陷。
+- 若某個 high-level module 只為了測試而存在、實際上卻由 adapter 重新實作，那就是缺陷。要嘛把 adapter 接上去，要嘛刪掉那段沒用到的 policy。
+- 列出允許依賴的 automated architecture checks 描述的是「預期的結構」，不是既成事實。如果正確的修法是往內呼叫，就修改那些 pin；不要把目前的 dependency graph 當成不可更動。
 
 ## Architectural Review Phases
-- UI/Core Separation：review UI、framework、IO 與 delivery details 是否和 core rules 分離，以及 core behavior 是否能在沒有 UI 或 IO 時被測試。
+- UI/Core Separation：review UI、framework、IO 與 delivery details 是否和 core rules 分離，以及 core behavior 是否能在沒有 UI 或 IO 時被測試。對於 UI 從 application state 呈現的每個 observable，找出那個已經知道答案的 domain function。UI 應該去問那個 function，而不是重做規則。
 - Dependency Rule：review dependency direction。遠離 IO 的 high-level modules 不得依賴靠近 IO 的 low-level modules；low-level modules 應透過 stable abstractions 或 inward calls 依賴 high-level modules。
 - Information Hiding And Encapsulation：review modules 是否只暴露必要 concepts、隱藏 representation 與 IO details、維持 invariants，並避免跨 boundaries 洩漏 framework 或 persistence structures。
 - Local Code Quality：review names、control flow、duplication、error handling、edge cases 與 local readability，因為它們會影響 architectural clarity。
